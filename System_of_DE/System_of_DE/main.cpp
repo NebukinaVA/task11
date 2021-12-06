@@ -16,10 +16,10 @@ int main()
 		prec = _prec;
 */
 	int i;
-	Pendulum equation(0.0, 1.0, 1.0, 9.8, 5.0, 0.0001, 1000, 1e-6, 0.7, 1e-4);
+	Pendulum equation(1.0, 1.0, 1.0, 9.8, 5.0, 0.001, 1000, 1e-5, 1.7, 1e-4);
 	equation.calculate_w_error();
-	//	equation.calculate();
-	std::cout << "RK3 METHOD\n" << equation << std::endl;
+//	equation.calculate();
+	std::cout << "RK4 METHOD\n" << equation << std::endl;
 	std::cin >> i;
 	return 0;
 }

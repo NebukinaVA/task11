@@ -106,8 +106,8 @@ public:
 					xn += h;
 				}
 				arg.insert(arg.begin() + i + 1, xn);
-				ures.insert(ures.begin() + i + 1, un);
-				vres.insert(vres.begin() + i + 1, vn);
+				ures.insert(ures.begin() + i + 1, result.first);
+				vres.insert(vres.begin() + i + 1, result.second);
  				steps.insert(steps.begin() + i + 1, h);
 			//	exres.insert(exres.begin() + i + 1, ExactSolution(xn));
 				hinc.insert(hinc.begin() + i + 1, 0);
@@ -167,8 +167,8 @@ public:
 				next = RK4(xn, result.first, result.second, h);
 				S1 = abs(cap.first - next.first) / 15.0;
 				S2 = abs(cap.second - next.second) / 15.0;
-			//	S = sqrt(pow(S1, 2) + pow(S2, 2)); // норма погрешности
-				S = std::max(S1, S2);
+				S = sqrt(pow(S1, 2) + pow(S2, 2)); // норма погрешности
+			//	S = std::max(S1, S2);
 				if (i == 0)
 				{
 					Smin = i + 1;
@@ -204,7 +204,7 @@ public:
 					}
 
 				}
-				else if (S < (eps / 16.0))
+				else if (S < (eps / 32.0))
 				{
 					if ((xn + h) > xmax)
 					{

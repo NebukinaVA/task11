@@ -137,7 +137,7 @@ public:
 		ures.push_back(u0);
 		vres.push_back(v0);
 		steps.push_back(0.0);
-		steps.push_back(h);
+//		steps.push_back(h);
 		reswcap.push_back(std::make_pair(0.0, 0.0));
 		hinc.push_back(0);
 		hdec.push_back(0);
@@ -152,6 +152,7 @@ public:
 		auto next = result;
 		double S, S1, S2;
 		int i = 0;
+		int count = 0; 
 		while (i < n)
 		{
 			if ((xn > (xmax - prec)) && (xn < xmax))
@@ -167,19 +168,11 @@ public:
 				next = RK4(xn, result.first, result.second, h);
 				S1 = abs(cap.first - next.first) / 15.0;
 				S2 = abs(cap.second - next.second) / 15.0;
-				S = sqrt(pow(S1, 2) + pow(S2, 2)); // норма погрешности
+			//	S1 = cap.first - next.first;
+			//	S2 = cap.second - next.second;
+				S = sqrt(pow(S1, 2) + pow(S2, 2));    // норма погрешности
+			//	S = S / 15.0;
 			//	S = std::max(S1, S2);
-				if (i == 0)
-				{
-					Smin = i + 1;
-					Smax = i + 1;
-					hmin = i + 1;
-					hmax = i + 1;
-				}
-				else if (S < ss[Smin])
-					Smin = i;
-				else if (S > ss[Smax])
-					Smax = i;
 				if ((S >= (eps / 32.0)) && (S <= eps))
 				{
 					if ((xn + h) > xmax)
@@ -192,15 +185,19 @@ public:
 						xhalf = xn + h / 2.0;
 					//	vn = RK4(xn, vn, h);
 						result = RK4(xn, result.first, result.second, h);
-						hinc.insert(hinc.begin() + i + 2, inc);
-						hdec.insert(hdec.begin() + i + 2, ++dec);
+						count = 1;
+						steps.insert(steps.begin() + i + 1, h);
+						hinc.insert(hinc.begin() + i + 1, inc);
+						hdec.insert(hdec.begin() + i + 1, ++dec);
 					}
 					else
 					{
+						count = 0;
 						result = next;
 						xn += h;
-						hinc.insert(hinc.begin() + i + 2, inc);
-						hdec.insert(hdec.begin() + i + 2, dec);
+						steps.insert(steps.begin() + i + 1, h);
+						hinc.insert(hinc.begin() + i + 1, inc);
+						hdec.insert(hdec.begin() + i + 1, dec);
 					}
 
 				}
@@ -215,15 +212,18 @@ public:
 						xn += h;
 						xhalf = xn + h / 2.0;
 						result = RK4(xn, result.first, result.second, h);
-						hinc.insert(hinc.begin() + i + 2, inc);
-						hdec.insert(hdec.begin() + i + 2, ++dec);
+						steps.insert(steps.begin() + i + 1, h);
+						hinc.insert(hinc.begin() + i + 1, inc);
+						hdec.insert(hdec.begin() + i + 1, ++dec);
 					}
 					else {
 						result = next;
 						xn += h;
+						steps.insert(steps.begin() + i + 1, h);
 						h *= 2.0;
 						hinc.insert(hinc.begin() + i + 2, ++inc);
 						hdec.insert(hdec.begin() + i + 2, dec);
+						count = 0;
 					}
 				}
 				else if (S > eps)
@@ -237,30 +237,41 @@ public:
 						xn += h;
 						xhalf = xn + h / 2.0;
 						result = RK4(xn, result.first, result.second, h);
-						hinc.insert(hinc.begin() + i + 2, inc);
-						hdec.insert(hdec.begin() + i + 2, ++dec);
+						steps.insert(steps.begin() + i + 1, h);
+						hinc.insert(hinc.begin() + i + 1, inc);
+						hdec.insert(hdec.begin() + i + 1, ++dec);
 					}
 					else {
 						h = h / 2.0;
 						result = RK4(xn, result.first, result.second, h);
 						xn += h;
-						hinc.insert(hinc.begin() + i + 2, inc);
-						hdec.insert(hdec.begin() + i + 2, ++dec);
+						steps.insert(steps.begin() + i + 1, h);
+						hinc.insert(hinc.begin() + i + 1, inc);
+						hdec.insert(hdec.begin() + i + 1, ++dec);
 					}
 				}
 				i++;
 				S *= 16.0;
-				if (h < steps[hmin])
+				if (i == 0)
+				{
+					Smin = i + 1;
+					Smax = i + 1;
 					hmin = i + 1;
+					hmax = i + 1;
+				}
+				else if (S < ss[Smin])
+					Smin = i;
+				else if (S > ss[Smax])
+					Smax = i;
+				if (h < steps[hmin])
+					hmin = i;
 				if (h > steps[hmax])
-					hmax = i + 1;;
+					hmax = i;
 				reswcap.insert(reswcap.begin() + i, cap);
 				ss.insert(ss.begin() + i, S);
 				arg.insert(arg.begin() + i, xn);
 				ures.insert(ures.begin() + i, result.first);
 				vres.insert(vres.begin() + i, result.second);
-				steps.insert(steps.begin() + i + 1, h);
-			//	exres.insert(exres.begin() + i, ExactSolution(xn));
 			}
 		}
 		N = i;

@@ -28,11 +28,11 @@ private:
 	std::vector<double> ss;    //S*
 	std::vector<int> hinc;  // total step increases
 	std::vector<int> hdec;  // total step decreases
-	double func1(double v) // u' = v
+	double func1(double x, double u, double v) // u' = v
 	{
 		return v;
 	}
-	double func2(double u) // v'= u'' = -g*sinu / L
+	double func2(double x, double u, double v) // v'= u'' = -g*sinu / L
 	{
 		return (-g * sin(u) / L);
 	}
@@ -52,7 +52,8 @@ public:
 	}
 	std::pair<double, double> RK4(double xn, double un, double vn, double h)
 	{
-		// first u'=func1(v)
+		/*
+        // first u'=func1(v)
 		double k1 = func1(vn);
 		double k2 = func1(vn + h * k1 / 4.0);
 		double k3 = func1(vn + h * k2 / 2.0);
@@ -64,6 +65,27 @@ public:
 		k3 = func2(un + h * k2 / 2.0);
 		k4 = func2(un + h * (k1 - 2.0 * k2 + 2.0 * k3));
 		vn += h * (k1 + 4.0 * k3 + k4) / 6.0;
+		*/
+		// u' = v
+		// v'= -g*sinu / L
+		double ku1, ku2, ku3, ku4;  // for un
+		double kv1, kv2, kv3, kv4;  // for vn
+
+		ku1 = func1(xn, un, vn);
+		kv1 = func2(xn, un, vn);
+
+		ku2 = func1(xn + h / 4.0, un + (h / 4.0)*ku1, vn + (h / 4.0)*kv1);
+		kv2 = func2(xn + h / 4.0, un + (h / 4.0)*ku1, vn + (h / 4.0)*kv1);
+		
+		ku3 = func1(xn + h / 2.0, un + (h / 2.0)*ku2, vn + (h / 2.0)*kv2);
+		kv3 = func2(xn + h / 2.0, un + (h / 2.0)*ku2, vn + (h / 2.0)*kv2);
+
+		ku4 = func1(xn + h, un + h * (ku1 - 2 * ku2 + 2 * ku3), vn + h * (kv1 - 2 * kv2 + 2 * kv3));
+		kv4 = func2(xn + h, un + h * (ku1 - 2 * ku2 + 2 * ku3), vn + h * (kv1 - 2 * kv2 + 2 * kv3));
+
+		un = un + h * (ku1 + 4.0 * ku3 + ku4) / 6.0;
+		vn = vn + h * (kv1 + 4.0 * kv3 + kv4) / 6.0;
+
 		return std::make_pair(un, vn);
 	}
 	std::pair<std::vector<double>, std::vector<double>> calculate()

@@ -139,7 +139,9 @@ public:
 		Xn = arg[i];
 		Un = ures[i];
 		Vn = vres[i];
-		hmin = i;
+		if (i == n)
+			hmin = 1;
+		else hmin = i;
 		hmax = 1;
 		std::pair<std::vector<double>, std::vector<double>> res;
 		res.first = ures;
@@ -169,7 +171,7 @@ public:
 		int i = 0;
 		while (i < n)
 		{
-			if ((xn > (xmax - prec)) && (xn < xmax))
+			if ((xn > (xmax - prec)) && (xn <= xmax))
 			{
 				break;
 			}
@@ -186,7 +188,7 @@ public:
 				{
 					if ((xn + h) > xmax)
 					{
-						while (((xn + h) > xmax) && (xn < (xmax - prec)))
+						while ((!((xn > (xmax - prec)) && (xn <= xmax))) && ((xn + h) > xmax))
 						{
 							h /= 2.0;
 						}
@@ -211,7 +213,7 @@ public:
 				{
 					if ((xn + h) > xmax)
 					{
-						while (((xn + h) > xmax) && (xn < (xmax - prec)))
+						while ((!((xn > (xmax - prec)) && (xn <= xmax))) && ((xn + h) > xmax))
 						{
 							h /= 2.0;
 						}
@@ -235,7 +237,7 @@ public:
 				{
 					if ((xn + h) > xmax)
 					{
-						while (((xn + h) > xmax) && (xn < (xmax - prec)))
+						while ((!((xn > (xmax - prec)) && (xn <= xmax))) && ((xn + h) > xmax))
 						{
 							h /= 2.0;
 						}
@@ -257,15 +259,15 @@ public:
 				}
 				i++;
 				S *= 16.0;
-			/*	if (i == 0)
+				if (i == 1)
 				{
-					Smin = i + 1;
-					Smax = i + 1;
-					hmin = i + 1;
-					hmax = i + 1;
+					Smin = i;
+					Smax = i;
+					hmin = i;
+					hmax = i;
 				}
-				*/
-				if (S < ss[Smin])
+				
+				else if (S < ss[Smin])
 					Smin = i;
 				else if (S > ss[Smax])
 					Smax = i;

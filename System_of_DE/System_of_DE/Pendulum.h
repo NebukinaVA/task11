@@ -105,14 +105,14 @@ public:
 		int i = 0;
 		while (i < n)
 		{
-			if ((xn > (xmax - prec)) && (xn < xmax))
+			if ((xn > (xmax - prec)) && (xn <= xmax))
 			{
 				break;
 			}
 			else {
 				if ((xn + h) > xmax)
 				{
-					while (((xn + h) > xmax) && (xn < (xmax - prec)))
+					while ((!((xn > (xmax - prec)) && (xn <= xmax))) && ((xn + h) > xmax))
 					{
 						h /= 2.0;
 					}
